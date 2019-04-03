@@ -9,7 +9,6 @@ typedef struct list {
 
 LIST *append( LIST *, int );
 LIST *sort( LIST * );
-LIST *list_switch( LIST *, LIST * );
 void print_list( LIST * );
 
 int main(void)
@@ -66,33 +65,33 @@ LIST *append( LIST *start, int newdata )
 
 LIST *sort( LIST *start )
 {
-	if( start == NULL || start->next ) return start;
+	if( start == NULL || !start->next ) return start;
 	LIST *merge = NULL, *right = start, *left = start;
-	for(;right->next != NULL || right->next->next != NULL; \
+	for(;right->next != NULL && right->next->next != NULL; \
             left=left->next,right=right->next->next);    
-	left->next = NULL;
+	right = left->next;
+    left->next = NULL;
     left = start;
     left = sort(left);
     right = sort(right);
-    while(left==NULL && right==NULL){
-        if(left == NULL || right != NULL || left->data >= right->data ){
-            if (merge == NULL) start = merge = left ;
-            merge->next = left;
+    while(left != NULL || right != NULL){
+        if(right == NULL || left != NULL && left->data >= right->data ){
+            if (merge == NULL){ 
+                start = merge = left ;
+            }else{
+                merge->next = left;
+                merge = merge->next;
+            }
             left = left->next;
         }else {
-            if(merge == NULL) start = merge = right;
-            merge->next = right;
-            right == right->next;
+            if(merge == NULL){ 
+                start = merge = right;
+            }else{
+                merge->next = right;
+                merge = merge->next;
+            }
+            right = right->next;
         }
-        merge = merge->next;
     }
 	return start;
 }
-
-LIST *list_switch( LIST *l1, LIST *l2 )
-{
-    l1->next = l2->next;
-    l2->next = l1;
-    return l2;
-} 
-
